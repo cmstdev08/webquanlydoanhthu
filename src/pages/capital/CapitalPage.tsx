@@ -384,28 +384,45 @@ export default function CapitalPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="label">Số tiền cam kết (VNĐ)</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="label mb-0">Số tiền cam kết (VNĐ)</label>
+              </div>
               <input
                 type="number"
                 min={0}
-                step={10000}
+                step="any"
                 placeholder="1000000"
                 value={committedAmount === 0 ? '' : committedAmount}
-                onChange={(e) => setCommittedAmount(e.target.value === '' ? 0 : Number(e.target.value))}
+                onChange={(e) => {
+                  const val = e.target.value === '' ? 0 : Number(e.target.value);
+                  setCommittedAmount(val);
+                  if (paidAmount === 0 || paidAmount === committedAmount) {
+                    setPaidAmount(val);
+                  }
+                }}
                 className="input"
               />
             </div>
             <div>
-              <label className="label">Số tiền thực nộp (VNĐ) *</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="label mb-0">Số tiền thực nộp (VNĐ) *</label>
+                <button
+                  type="button"
+                  onClick={() => setPaidAmount(committedAmount)}
+                  className="text-xs text-secondary hover:underline font-medium"
+                >
+                  Bằng số cam kết
+                </button>
+              </div>
               <input
                 type="number"
-                min={1000}
-                step={10000}
+                min={0}
+                step="any"
                 required
                 placeholder="1000000"
                 value={paidAmount === 0 ? '' : paidAmount}
                 onChange={(e) => setPaidAmount(e.target.value === '' ? 0 : Number(e.target.value))}
-                className="input font-bold"
+                className="input font-bold text-success"
               />
             </div>
           </div>
