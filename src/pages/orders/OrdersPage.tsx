@@ -530,10 +530,11 @@ export default function OrdersPage() {
                           <input
                             type="number"
                             min={1}
+                            step="any"
                             max={item.stock}
-                            value={item.quantity}
+                            value={item.quantity === 0 ? '' : item.quantity}
                             onChange={(e) =>
-                              handleUpdateItemQty(item.productId, parseInt(e.target.value) || 1)
+                              handleUpdateItemQty(item.productId, e.target.value === '' ? 1 : parseInt(e.target.value))
                             }
                             className="input py-1 px-2 text-xs w-20"
                           />
@@ -564,8 +565,10 @@ export default function OrdersPage() {
               <input
                 type="number"
                 min={0}
-                value={discountAmount}
-                onChange={(e) => setDiscountAmount(Number(e.target.value) || 0)}
+                step="any"
+                placeholder="0"
+                value={discountAmount === 0 ? '' : discountAmount}
+                onChange={(e) => setDiscountAmount(e.target.value === '' ? 0 : Number(e.target.value))}
                 className="input"
               />
             </div>
@@ -574,8 +577,10 @@ export default function OrdersPage() {
               <input
                 type="number"
                 min={0}
-                value={shippingFee}
-                onChange={(e) => setShippingFee(Number(e.target.value) || 0)}
+                step="any"
+                placeholder="0"
+                value={shippingFee === 0 ? '' : shippingFee}
+                onChange={(e) => setShippingFee(e.target.value === '' ? 0 : Number(e.target.value))}
                 className="input"
               />
             </div>

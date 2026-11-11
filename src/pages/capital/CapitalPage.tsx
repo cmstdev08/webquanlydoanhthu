@@ -437,7 +437,7 @@ export default function CapitalPage() {
                   onClick={() => setPaidAmount(committedAmount)}
                   className="text-xs text-secondary hover:underline font-medium"
                 >
-                  Bằng số cam kết
+                  *
                 </button>
               </div>
               <input
