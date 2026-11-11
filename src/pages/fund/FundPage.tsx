@@ -332,8 +332,8 @@ export default function FundPage() {
             <label className="label">Số tiền (VNĐ) *</label>
             <input
               type="number"
-              min={1000}
-              step={1000}
+              min={0}
+              step="any"
               required
               value={amount === 0 ? '' : amount}
               onChange={(e) => setAmount(e.target.value === '' ? 0 : Number(e.target.value))}

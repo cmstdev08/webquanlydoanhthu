@@ -51,6 +51,14 @@ export const financeService = {
     return data as CapitalContribution;
   },
 
+  async deleteCapitalContribution(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('capital_contributions')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  },
+
   async getTotalCapital(groupId: string): Promise<number> {
     const { data, error } = await supabase
       .from('capital_contributions')

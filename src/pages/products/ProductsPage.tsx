@@ -792,7 +792,7 @@ export default function ProductsPage() {
                 })}
                 type="number"
                 min={0}
-                step="1000"
+                step="any"
                 className="input currency"
               />
               {errors.cost_price && (
@@ -813,7 +813,7 @@ export default function ProductsPage() {
                 })}
                 type="number"
                 min={0}
-                step="1000"
+                step="any"
                 className="input currency"
               />
               {errors.sell_price && (

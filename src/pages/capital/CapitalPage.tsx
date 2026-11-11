@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Plus, PiggyBank, CheckCircle, Clock, AlertCircle,
-  FileSpreadsheet, Printer, Users, User, ArrowUpRight
+  FileSpreadsheet, Printer, Users, User, ArrowUpRight, Trash2
 } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { financeService } from '@/services/finance.service';
@@ -29,6 +29,7 @@ export default function CapitalPage() {
   // Modals
   const createModal = useDisclosure();
   const confirmModal = useDisclosure();
+  const deleteModal = useDisclosure();
   const [selectedContribution, setSelectedContribution] = useState<CapitalContribution | null>(null);
 
   // Form state
@@ -144,6 +145,19 @@ export default function CapitalPage() {
       loadData();
     } catch (err: any) {
       toast.error('Lỗi xác nhận', err.message);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedContribution) return;
+    try {
+      await financeService.deleteCapitalContribution(selectedContribution.id);
+      toast.success('Đã xóa bản ghi góp vốn');
+      deleteModal.close();
+      setSelectedContribution(null);
+      loadData();
+    } catch (err: any) {
+      toast.error('Lỗi khi xóa bản ghi', err.message);
     }
   };
 
@@ -332,17 +346,29 @@ export default function CapitalPage() {
                         </td>
                         {isManagerOrAdmin && (
                           <td>
-                            {c.status === 'pending' && (
+                            <div className="flex items-center gap-1.5">
+                              {c.status === 'pending' && (
+                                <button
+                                  onClick={() => {
+                                    setSelectedContribution(c);
+                                    confirmModal.open();
+                                  }}
+                                  className="text-xs btn-primary py-1 px-2"
+                                >
+                                  Xác nhận
+                                </button>
+                              )}
                               <button
                                 onClick={() => {
                                   setSelectedContribution(c);
-                                  confirmModal.open();
+                                  deleteModal.open();
                                 }}
-                                className="text-xs btn-primary py-1 px-2.5"
+                                className="p-1 text-gray-400 hover:text-danger rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                title="Xóa bản ghi này"
                               >
-                                Xác nhận
+                                <Trash2 size={16} />
                               </button>
-                            )}
+                            </div>
                           </td>
                         )}
                       </tr>
@@ -482,6 +508,17 @@ export default function CapitalPage() {
         message={`Bạn có chắc muốn xác nhận khoản tiền ${formatCurrency(selectedContribution?.paid_amount)} đã được chuyển vào tài khoản quỹ vốn của nhóm?`}
         confirmLabel="Xác nhận tiền đã vào"
         variant="primary"
+      />
+
+      {/* Modal Delete Confirmation */}
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.close}
+        onConfirm={handleDelete}
+        title="Xóa bản ghi góp vốn"
+        message={`Bạn có chắc muốn xóa bản ghi góp vốn ${formatCurrency(selectedContribution?.paid_amount)} của ${(selectedContribution as any)?.profiles?.full_name || 'thành viên này'} không? Hành động này không thể hoàn tác.`}
+        confirmLabel="Xóa bản ghi"
+        variant="danger"
       />
     </div>
   );
