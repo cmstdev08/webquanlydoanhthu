@@ -250,20 +250,31 @@ CREATE INDEX IF NOT EXISTS idx_activity_logs_group_id ON public.activity_logs(gr
 -- ==============================================================================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+    user_count INT;
+    assigned_role VARCHAR(20);
 BEGIN
+    -- Check if this is the first user in the system
+    SELECT COUNT(*) INTO user_count FROM public.profiles;
+
+    IF user_count = 0 THEN
+        assigned_role := 'admin';
+    ELSE
+        assigned_role := 'member';
+    END IF;
+
     INSERT INTO public.profiles (id, email, full_name, avatar_url, role, status, group_id)
     VALUES (
         NEW.id,
         NEW.email,
         COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1)),
         NEW.raw_user_meta_data->>'avatar_url',
-        COALESCE(NEW.raw_user_meta_data->>'role', 'member'),
+        assigned_role,
         'active',
         '00000000-0000-0000-0000-000000000001'
     )
     ON CONFLICT (id) DO UPDATE SET
-        full_name = EXCLUDED.full_name,
-        role = EXCLUDED.role;
+        full_name = EXCLUDED.full_name;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

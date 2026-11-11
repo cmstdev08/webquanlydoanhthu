@@ -35,8 +35,11 @@ export default function LoginPage() {
     setLoading(true);
     try {
       if (isRegister) {
-        await authService.signUp(data.email, data.password, data.fullName || 'Người dùng', data.role || 'admin');
-        toast.success('Đăng ký tài khoản thành công', 'Bạn có thể đăng nhập ngay bây giờ!');
+        await authService.signUp(data.email, data.password, data.fullName || 'Người dùng');
+        toast.success(
+          'Đăng ký tài khoản thành công',
+          'Tài khoản đầu tiên sẽ nhận quyền Quản trị viên (Admin). Bạn có thể đăng nhập ngay!'
+        );
         setIsRegister(false);
         reset();
       } else {
@@ -172,17 +175,11 @@ export default function LoginPage() {
               )}
             </div>
 
-            {/* Role selection on register */}
+            {/* Info notice for registration */}
             {isRegister && (
-              <div>
-                <label className="label">Vai trò ban đầu</label>
-                <select {...register('role')} className="input text-sm">
-                  <option value="admin">Quản trị viên (Admin - Nhóm trưởng)</option>
-                  <option value="manager">Quản lý (Manager - Thủ kho/Đơn hàng)</option>
-                  <option value="member">Thành viên (Member)</option>
-                </select>
-                <p className="text-xs text-gray-400 mt-1">
-                  Đăng ký tài khoản đầu tiên làm Quản trị viên để quản lý hệ thống.
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  🛡️ <strong>Chính sách phân quyền:</strong> Tài khoản đầu tiên đăng ký hệ thống sẽ tự động được cấp quyền <strong>Quản trị viên (Admin)</strong>. Các tài khoản đăng ký sau sẽ là <strong>Thành viên (Member)</strong> và được Admin phân quyền riêng trong trang Quản lý thành viên.
                 </p>
               </div>
             )}

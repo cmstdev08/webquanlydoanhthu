@@ -16,26 +16,35 @@ export const authService = {
 
   /**
    * Sign up (Register)
+   * The first user in the database becomes Admin, subsequent users become Members.
    */
-  async signUp(email: string, password: string, fullName: string, role = 'member') {
+  async signUp(email: string, password: string, fullName: string) {
+    // Check if any profiles exist in the system
+    const { count } = await supabase
+      .from('profiles')
+      .select('id', { count: 'exact', head: true });
+
+    const isFirstUser = (count || 0) === 0;
+    const assignedRole = isFirstUser ? 'admin' : 'member';
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           full_name: fullName,
-          role,
+          role: assignedRole,
         },
       },
     });
     if (error) throw error;
 
-    // Link user to default group if exists
+    // Link user to default group with appropriate role
     if (data.user) {
       const defaultGroupId = '00000000-0000-0000-0000-000000000001';
       await supabase
         .from('profiles')
-        .update({ group_id: defaultGroupId, role: role as any } as any)
+        .update({ group_id: defaultGroupId, role: assignedRole as any } as any)
         .eq('id', data.user.id);
     }
 
