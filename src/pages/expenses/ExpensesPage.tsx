@@ -289,8 +289,8 @@ export default function ExpensesPage() {
               min={1000}
               step={1000}
               required
-              value={amount || ''}
-              onChange={(e) => setAmount(Number(e.target.value) || 0)}
+              value={amount === 0 ? '' : amount}
+              onChange={(e) => setAmount(e.target.value === '' ? 0 : Number(e.target.value))}
               className="input text-lg font-bold"
               placeholder="50,000"
             />

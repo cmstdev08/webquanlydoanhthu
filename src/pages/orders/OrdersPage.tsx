@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Plus, Search, ShoppingCart, Eye, CheckCircle2, Clock, Truck,
-  CheckCheck, XCircle, RotateCcw, Filter, User, Calendar, Trash2
+  CheckCheck, XCircle, RotateCcw, Filter, User, Calendar, Trash2, Printer
 } from 'lucide-react';
 import { supabase } from '@/config/supabase';
 import { orderService } from '@/services/order.service';
@@ -633,7 +633,31 @@ export default function OrdersPage() {
       </Modal>
 
       {/* Modal View Detail */}
-      <Modal isOpen={detailModal.isOpen} onClose={detailModal.close} title="Chi tiết đơn hàng" size="lg">
+      <Modal
+        isOpen={detailModal.isOpen}
+        onClose={detailModal.close}
+        title="Chi tiết đơn hàng"
+        size="lg"
+        footer={
+          <div className="flex justify-between items-center w-full">
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="btn-secondary flex items-center gap-2 text-sm"
+            >
+              <Printer size={16} />
+              In hóa đơn
+            </button>
+            <button
+              type="button"
+              onClick={detailModal.close}
+              className="btn-primary"
+            >
+              Đóng
+            </button>
+          </div>
+        }
+      >
         {selectedOrder && (
           <div className="space-y-4">
             <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-3">

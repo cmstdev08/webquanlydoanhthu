@@ -388,9 +388,10 @@ export default function CapitalPage() {
               <input
                 type="number"
                 min={0}
-                step={50000}
-                value={committedAmount}
-                onChange={(e) => setCommittedAmount(Number(e.target.value) || 0)}
+                step={10000}
+                placeholder="1000000"
+                value={committedAmount === 0 ? '' : committedAmount}
+                onChange={(e) => setCommittedAmount(e.target.value === '' ? 0 : Number(e.target.value))}
                 className="input"
               />
             </div>
@@ -399,10 +400,11 @@ export default function CapitalPage() {
               <input
                 type="number"
                 min={1000}
-                step={50000}
+                step={10000}
                 required
-                value={paidAmount}
-                onChange={(e) => setPaidAmount(Number(e.target.value) || 0)}
+                placeholder="1000000"
+                value={paidAmount === 0 ? '' : paidAmount}
+                onChange={(e) => setPaidAmount(e.target.value === '' ? 0 : Number(e.target.value))}
                 className="input font-bold"
               />
             </div>
