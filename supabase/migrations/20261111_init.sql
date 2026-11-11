@@ -247,6 +247,7 @@ CREATE INDEX IF NOT EXISTS idx_activity_logs_group_id ON public.activity_logs(gr
 
 -- ==============================================================================
 -- AUTOMATIC TRIGGER FOR PROFILE CREATION ON USER SIGNUP
+-- Rule: The 1st user registered in profiles gets 'admin'. Subsequent users get 'member'.
 -- ==============================================================================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
@@ -254,7 +255,7 @@ DECLARE
     user_count INT;
     assigned_role VARCHAR(20);
 BEGIN
-    -- Check if this is the first user in the system
+    -- Count existing profiles
     SELECT COUNT(*) INTO user_count FROM public.profiles;
 
     IF user_count = 0 THEN
@@ -302,110 +303,129 @@ ALTER TABLE public.expenses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.activity_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
--- Helper function: get user group_id
-CREATE OR REPLACE FUNCTION public.get_user_group_id()
-RETURNS UUID AS $$
-    SELECT COALESCE(
-        (SELECT group_id FROM public.profiles WHERE id = auth.uid() LIMIT 1),
-        '00000000-0000-0000-0000-000000000001'::uuid
-    );
-$$ LANGUAGE sql STABLE SECURITY DEFINER;
-
--- Profiles: Anyone authenticated can view and update their profile
+-- Profiles Policies
+DROP POLICY IF EXISTS "Profiles select policy" ON public.profiles;
 CREATE POLICY "Profiles select policy" ON public.profiles
     FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Profiles update policy" ON public.profiles;
 CREATE POLICY "Profiles update policy" ON public.profiles
     FOR UPDATE TO authenticated USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Profiles insert policy" ON public.profiles;
 CREATE POLICY "Profiles insert policy" ON public.profiles
     FOR INSERT TO authenticated WITH CHECK (true);
 
--- Groups
+-- Groups Policies
+DROP POLICY IF EXISTS "Groups select policy" ON public.groups;
 CREATE POLICY "Groups select policy" ON public.groups
     FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Groups all policy" ON public.groups;
 CREATE POLICY "Groups all policy" ON public.groups
     FOR ALL TO authenticated USING (true);
 
--- Categories
+-- Categories Policies
+DROP POLICY IF EXISTS "Categories select policy" ON public.categories;
 CREATE POLICY "Categories select policy" ON public.categories
     FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Categories modify policy" ON public.categories;
 CREATE POLICY "Categories modify policy" ON public.categories
     FOR ALL TO authenticated USING (true);
 
--- Suppliers
+-- Suppliers Policies
+DROP POLICY IF EXISTS "Suppliers select policy" ON public.suppliers;
 CREATE POLICY "Suppliers select policy" ON public.suppliers
     FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Suppliers modify policy" ON public.suppliers;
 CREATE POLICY "Suppliers modify policy" ON public.suppliers
     FOR ALL TO authenticated USING (true);
 
--- Products
+-- Products Policies
+DROP POLICY IF EXISTS "Products select policy" ON public.products;
 CREATE POLICY "Products select policy" ON public.products
     FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Products modify policy" ON public.products;
 CREATE POLICY "Products modify policy" ON public.products
     FOR ALL TO authenticated USING (true);
 
--- Inventory Transactions
+-- Inventory Transactions Policies
+DROP POLICY IF EXISTS "Inventory select policy" ON public.inventory_transactions;
 CREATE POLICY "Inventory select policy" ON public.inventory_transactions
     FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Inventory modify policy" ON public.inventory_transactions;
 CREATE POLICY "Inventory modify policy" ON public.inventory_transactions
     FOR ALL TO authenticated USING (true);
 
--- Orders
+-- Orders Policies
+DROP POLICY IF EXISTS "Orders select policy" ON public.orders;
 CREATE POLICY "Orders select policy" ON public.orders
     FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Orders modify policy" ON public.orders;
 CREATE POLICY "Orders modify policy" ON public.orders
     FOR ALL TO authenticated USING (true);
 
--- Order Items
+-- Order Items Policies
+DROP POLICY IF EXISTS "Order items select policy" ON public.order_items;
 CREATE POLICY "Order items select policy" ON public.order_items
     FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Order items modify policy" ON public.order_items;
 CREATE POLICY "Order items modify policy" ON public.order_items
     FOR ALL TO authenticated USING (true);
 
--- Capital Contributions
+-- Capital Contributions Policies
+DROP POLICY IF EXISTS "Capital select policy" ON public.capital_contributions;
 CREATE POLICY "Capital select policy" ON public.capital_contributions
     FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Capital modify policy" ON public.capital_contributions;
 CREATE POLICY "Capital modify policy" ON public.capital_contributions
     FOR ALL TO authenticated USING (true);
 
--- Fund Transactions
+-- Fund Transactions Policies
+DROP POLICY IF EXISTS "Fund select policy" ON public.fund_transactions;
 CREATE POLICY "Fund select policy" ON public.fund_transactions
     FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Fund modify policy" ON public.fund_transactions;
 CREATE POLICY "Fund modify policy" ON public.fund_transactions
     FOR ALL TO authenticated USING (true);
 
--- Expense Categories
+-- Expense Categories Policies
+DROP POLICY IF EXISTS "Expense categories select policy" ON public.expense_categories;
 CREATE POLICY "Expense categories select policy" ON public.expense_categories
     FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Expense categories modify policy" ON public.expense_categories;
 CREATE POLICY "Expense categories modify policy" ON public.expense_categories
     FOR ALL TO authenticated USING (true);
 
--- Expenses
+-- Expenses Policies
+DROP POLICY IF EXISTS "Expenses select policy" ON public.expenses;
 CREATE POLICY "Expenses select policy" ON public.expenses
     FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Expenses modify policy" ON public.expenses;
 CREATE POLICY "Expenses modify policy" ON public.expenses
     FOR ALL TO authenticated USING (true);
 
--- Activity Logs
+-- Activity Logs Policies
+DROP POLICY IF EXISTS "Activity logs select policy" ON public.activity_logs;
 CREATE POLICY "Activity logs select policy" ON public.activity_logs
     FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Activity logs insert policy" ON public.activity_logs;
 CREATE POLICY "Activity logs insert policy" ON public.activity_logs
     FOR INSERT TO authenticated WITH CHECK (true);
 
--- Notifications
+-- Notifications Policies
+DROP POLICY IF EXISTS "Notifications access policy" ON public.notifications;
 CREATE POLICY "Notifications access policy" ON public.notifications
     FOR ALL TO authenticated USING (user_id = auth.uid());
 
